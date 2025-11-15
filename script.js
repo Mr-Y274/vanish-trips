@@ -109,40 +109,6 @@ if (bookingForm) {
     });
 }
 
-// Contact Form Handling
-const contactForm = document.getElementById('contact-form');
-const contactModal = document.getElementById('contact-modal');
-
-if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
-        // Get form values
-        const formData = new FormData(contactForm);
-        const name = formData.get('contact-name');
-        const email = formData.get('contact-email');
-        const subject = formData.get('subject');
-        const message = formData.get('contact-message');
-        
-        // Basic validation
-        if (!name || !email || !subject || !message) {
-            e.preventDefault();
-            alert('Please fill in all required fields.');
-            return;
-        }
-        
-        // Email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            e.preventDefault();
-            alert('Please enter a valid email address.');
-            return;
-        }
-        
-        // Show modal after a short delay to allow form submission
-        setTimeout(() => {
-            contactModal.classList.add('show');
-        }, 100);
-    });
-}
 
 // Book Now Buttons - Pre-fill destination in booking form
 document.querySelectorAll('[data-trip]').forEach(button => {
@@ -166,8 +132,33 @@ document.querySelectorAll('[data-trip]').forEach(button => {
                     destinationSelect.focus();
                 }, 500);
             }
+        } else {
+            // If booking form doesn't exist on this page, redirect to index.html with booking section
+            window.location.href = `index.html?trip=${encodeURIComponent(tripName)}#booking`;
         }
     });
+});
+
+// Handle trip parameter from URL on index.html
+window.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tripParam = urlParams.get('trip');
+    if (tripParam) {
+        setTimeout(() => {
+            const destinationSelect = document.getElementById('destination');
+            if (destinationSelect) {
+                destinationSelect.value = tripParam;
+                const bookingSection = document.getElementById('booking');
+                if (bookingSection) {
+                    const offsetTop = bookingSection.offsetTop - 80;
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        }, 500);
+    }
 });
 
 // Modal Close Functions
@@ -175,9 +166,6 @@ function closeModal() {
     bookingModal.classList.remove('show');
 }
 
-function closeContactModal() {
-    contactModal.classList.remove('show');
-}
 
 // Close modals when clicking outside
 if (bookingModal) {
@@ -188,13 +176,6 @@ if (bookingModal) {
     });
 }
 
-if (contactModal) {
-    contactModal.addEventListener('click', function(e) {
-        if (e.target === contactModal) {
-            closeContactModal();
-        }
-    });
-}
 
 // Close modals with close button
 document.querySelectorAll('.modal-close').forEach(closeBtn => {
@@ -212,9 +193,6 @@ document.addEventListener('keydown', function(e) {
         if (bookingModal && bookingModal.classList.contains('show')) {
             closeModal();
         }
-        if (contactModal && contactModal.classList.contains('show')) {
-            closeContactModal();
-        }
     }
 });
 
@@ -226,11 +204,11 @@ window.addEventListener('scroll', () => {
     const currentScroll = window.pageYOffset;
     
     if (currentScroll > 100) {
-        navbar.style.background = 'rgba(10, 15, 31, 0.98)';
-        navbar.style.boxShadow = '0 2px 20px rgba(10, 15, 31, 0.5)';
+        navbar.style.background = 'oklch(1.0000 0 0 / 0.98)';
+        navbar.style.boxShadow = 'var(--shadow-xl)';
     } else {
-        navbar.style.background = 'rgba(10, 15, 31, 0.95)';
-        navbar.style.boxShadow = '0 2px 10px rgba(10, 15, 31, 0.3)';
+        navbar.style.background = 'oklch(1.0000 0 0 / 0.95)';
+        navbar.style.boxShadow = 'var(--shadow-md)';
     }
     
     lastScroll = currentScroll;
